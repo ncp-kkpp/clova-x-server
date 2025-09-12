@@ -77,3 +77,85 @@ class HyperCLOVAService:
             
         except Exception as e:
             return {"success": False, "error": f"응답 파싱 실패: {str(e)}"}
+
+
+    def chat_completion_stream_generator(
+        self,
+        messages: List[Dict[str, str]],
+        max_tokens: int = 256,
+        temperature: float = 0.5
+    ):
+        payload = {
+            "messages": messages,
+            "topP": 0.8,
+            "topK": 0,
+            "maxTokens": max_tokens,
+            "temperature": temperature,
+            "repeatPenalty": 1.1,
+            "stop": [],
+            "seed": 0,
+            "includeAiFilters": True
+        }
+        
+        try:
+            response = requests.post(
+                self.base_url,
+                headers=self._get_headers(),
+                json=payload,
+                stream=True,
+                timeout=30
+            )
+            response.raise_for_status()
+            
+            for line in response.iter_lines():
+                if line:
+                    line = line.decode('utf-8')
+                    if line.startswith('data:'):
+                        data = line[len('data:'):].lstrip()
+                        if data == '[DONE]':
+                            break
+                        try:
+                            json_data = json.loads(data)
+                            yield json_data
+                        except json.JSONDecodeError:
+                            continue
+                            
+        except requests.exceptions.RequestException as e:
+            yield {"success": False, "error": f"API 요청 실패: {str(e)}"}
+        payload = {
+            "messages": messages,
+            "topP": 0.8,
+            "topK": 0,
+            "maxTokens": max_tokens,
+            "temperature": temperature,
+            "repeatPenalty": 1.1,
+            "stop": [],
+            "seed": 0,
+            "includeAiFilters": True
+        }
+        
+        try:
+            response = requests.post(
+                self.base_url,
+                headers=self._get_headers(),
+                json=payload,
+                stream=True,
+                timeout=30
+            )
+            response.raise_for_status()
+            
+            for line in response.iter_lines():
+                if line:
+                    line = line.decode('utf-8')
+                    if line.startswith('data:'):
+                        data = line[len('data:'):].lstrip()
+                        if data == '[DONE]':
+                            break
+                        try:
+                            json_data = json.loads(data)
+                            yield json_data
+                        except json.JSONDecodeError:
+                            continue
+                            
+        except requests.exceptions.RequestException as e:
+            yield {"success": False, "error": f"API 요청 실패: {str(e)}"}
