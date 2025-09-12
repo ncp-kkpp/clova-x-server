@@ -111,64 +111,35 @@ curl -X GET "http://127.0.0.1:8000/api/v1/health/"
 }
 ```
 
-### 2. Simple Chat
+### 2. Simple Chat (Streaming)
 
-간단한 단일 메시지로 채팅합니다.
-
-**Request**
-
-```bash
-curl -X POST "http://127.0.0.1:8000/api/v1/chat/simple" \
--H "Content-Type: application/json" \
--d '{
-  "message": "안녕하세요, 오늘 날씨는 어떤가요?",
-  "system_prompt": "당신은 날씨를 알려주는 비서입니다."
-}'
-```
-
-**Response**
-
-```json
-{
-  "success": true,
-  "message": "안녕하세요! 오늘 서울의 날씨는 맑고 화창합니다. 최고 기온은 25도, 최저 기온은 15도로 예상됩니다.",
-  "tokens_used": 50
-}
-```
-
-### 3. Conversation Chat
-
-대화 히스토리를 포함하여 연속적인 대화를 나눕니다.
+간단한 단일 메시지로 채팅하며, 응답을 스트리밍으로 받습니다.
 
 **Request**
 
 ```bash
-curl -X POST "http://127.0.0.1:8000/api/v1/chat/conversation" \
--H "Content-Type: application/json" \
--d '{
-  "messages": [
-    {
-      "role": "user",
-      "content": "안녕, 나는 철수야."
-    },
-    {
-      "role": "assistant",
-      "content": "안녕하세요, 철수님! 무엇을 도와드릴까요?"
-    },
-    {
-      "role": "user",
-      "content": "내 이름이 뭐라고 했지?"
-    }
-  ]
-}'
+curl.exe -N -X POST "http://localhost:8000/api/v1/chat/simple" -H "Accept: text/event-stream" -H "Content-Type: application/json" --data-raw "{\"message\":\"당근 양파 쌀밥 배추\",\"max_tokens\":256,\"temperature\":0.5,\"system_prompt\":\"너는 고급 레스토랑에서 일을하는 전문 요리사 ai assistant야. 사용자는 식재료만 입력할거야. 식재료를 가 지고 할 수 있는 간단한 요리라도 추천해줄 수 있는 유능한 요리사야. 대답할 땐, 추천할 수 있는 요리와 요리의 난이도, 조리과정을 구체적으로 설명해.\"}"
 ```
 
 **Response**
 
+응답은 `text/event-stream` 형식으로 스트리밍됩니다. 각 이벤트는 다음과 같은 JSON 구조를 가집니다.
+
 ```json
-{
-  "success": true,
-  "message": "철수라고 하셨습니다. 😊",
-  "tokens_used": 25
-}
+data: {"success":true,"message":"사용자님께서 제공하신 식재료로 만들 수 있는 요리는 '채소 볶음밥'입니다."}
+
+data: {"success":true,"message":"\n\n난이도는 중간이며, 아래는 조리 과정입니다."}
+
+data: {"success":true,"message":"\n\n1. 당근과 양파는 잘게 다지고, 배추는 적당한 크기로 썰어줍니다."}
+
+data: {"success":true,"message":"\n2. 팬에 기름을 두르고 다진 마늘 1큰술을 넣어 향이 올라올 때까지 볶아줍니다."}
+
+data: {"success":true,"message":"\n3. 이후 다져둔 당근, 양파를 넣고 함께 볶다가 반쯤 익으면 배추를 넣습니다."}
+
+data: {"success":true,"message":"\n4. 채소가 모두 익으면 밥 한 공기를 넣고 같이 볶아줍니다."}
+
+data: {"success":true,"message":"\n5. 소금과 후추로 간을 하고, 마지막으로 참기름을 뿌려주면 완성됩니다."}
+
+data: {"success":true,"message":"\n\n간단하면서도 영양가 높은 채소 볶음밥은 아이들도 좋아하는 건강식 메뉴입니다. 취향에 따라 다른 야채나 고기를 추가하여 더욱 맛있게 즐길 수도 있습니다. 즐거운 식사 되세요!"}
 ```
+

@@ -45,27 +45,3 @@ async def simple_chat(
                 yield f"data: {json_string}\n\n"
 
     return StreamingResponse(stream_generator(), media_type="text/event-stream")
-
-
-@router.post("/conversation", response_model=ChatResponse)
-async def conversation_chat(
-    request: ConversationRequest,
-    service: HyperCLOVAService = Depends(get_hyperclova_service)
-):
-    """대화 히스토리를 포함한 채팅"""
-    messages = [{"role": msg.role.value, "content": msg.content} for msg in request.messages]
-    
-    result = await service.chat_completion(
-        messages=messages,
-        max_tokens=request.max_tokens,
-        temperature=request.temperature
-    )
-    
-    if not result.get("success"):
-        raise HTTPException(status_code=500, detail=result.get("error"))
-    
-    return ChatResponse(
-        success=True,
-        message=result["content"],
-        tokens_used=result.get("tokens_used")
-    )
