@@ -8,15 +8,11 @@ from app.models import ChatMessage
 class HyperCLOVAService:
     def __init__(self):
         self.api_key = settings.hyperclova_api_key
-        self.primary_key = settings.hyperclova_primary_key
-        self.request_id = settings.hyperclova_request_id
-        self.base_url = "https://clovastudio.stream.ntruss.com/testapp/v1/chat-completions"
+        self.base_url = "https://clovastudio.stream.ntruss.com/v3/chat-completions/HCX-005"
     
     def _get_headers(self) -> Dict[str, str]:
         return {
-            'X-NCP-CLOVASTUDIO-API-KEY': self.api_key,
-            'X-NCP-APIGW-API-KEY': self.primary_key,
-            'X-NCP-CLOVASTUDIO-REQUEST-ID': str(uuid.uuid4()),
+            'Authorization': self.api_key,
             'Content-Type': 'application/json',
             'Accept': 'text/event-stream'
         }
@@ -29,11 +25,13 @@ class HyperCLOVAService:
     ) -> Dict:
         payload = {
             "messages": messages,
-            "maxTokens": max_tokens,
-            "temperature": temperature,
             "topP": 0.8,
             "topK": 0,
-            "repeatPenalty": 5.0,
+            "maxTokens": max_tokens,
+            "temperature": temperature,
+            "repeatPenalty": 1.1,
+            "stop": [],
+            "seed": 0,
             "includeAiFilters": True
         }
         
