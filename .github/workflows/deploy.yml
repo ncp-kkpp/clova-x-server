@@ -38,7 +38,7 @@ jobs:
         with:
           host: ${{ secrets.SERVER_IP }}
           username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          password: ${{ secrets.SERVER_PASSWORD }}
           script: |
             echo "Login to NCP Container Registry..."
             echo "${{ secrets.NCP_SECRET_KEY }}" | docker login --username ${{ secrets.NCP_ACCESS_KEY }} --password-stdin vst.kr.ncr.ntruss.com
