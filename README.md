@@ -36,7 +36,7 @@ clova-x-server/
 - Docker (선택 사항)
 - Naver Cloud Platform API Key (HyperCLOVA X 사용 권한)
 
-### 2. 설치
+### 2. 설치 (로컬 개발 환경)
 
 ```bash
 # 1. 프로젝트 클론
@@ -49,32 +49,14 @@ source venv/bin/activate
 
 # 3. 의존성 패키지 설치
 pip install -r requirements.txt
-```
 
-### 3. 환경 변수 설정
-
-프로젝트 루트 디렉터리에 `.env` 파일을 생성하고 아래 내용을 채워주세요.
-
-```env
-# .env
-
-# Naver Cloud Platform에서 발급받은 HyperCLOVA X API 키
-HYPERCLOVA_API_KEY="여기에_API_키를_입력하세요"
-```
-
-### 4. 서버 실행
-
-#### 개발 환경
-
-`uvicorn`을 사용하여 개발 서버를 실행합니다. 코드가 변경될 때마다 자동으로 재시작되어 편리합니다.
-
-```bash
+# 4. 환경 변수 설정 및 실행
+export hyperclova_api_key="여기에_API_키를_입력하세요"
 uvicorn app.main:app --reload
 ```
-
 서버가 `http://127.0.0.1:8000`에서 실행됩니다.
 
-#### Docker 사용
+### 3. 서버 실행 (Docker)
 
 Docker를 사용하여 컨테이너 환경에서 서버를 실행할 수 있습니다.
 
@@ -83,10 +65,23 @@ Docker를 사용하여 컨테이너 환경에서 서버를 실행할 수 있습�
 docker build -t clova-x-server .
 
 # 2. Docker 컨테이너 실행
+# 실행 시 -e 옵션을 사용하여 HyperCLOVA X API 키를 환경 변수로 전달해야 합니다.
 docker run -d --name clova-x-server \
-  --env-file .env \
+  -e hyperclova_api_key="여기에_API_키를_입력하세요" \
   -p 8000:8000 \
   clova-x-server
+```
+
+GitHub Actions와 같은 CI/CD 환경에서는 Secrets를 사용하여 API 키를 안전하게 전달할 수 있습니다.
+
+```yaml
+# 예시: GitHub Actions에서 Docker 컨테이너 실행
+- name: Run Docker Container
+  run: |
+    docker run -d --name clova-x-server \
+      -e hyperclova_api_key=${{ secrets.HYPERCLOVA_API_KEY }} \
+      -p 8000:8000 \
+      clova-x-server
 ```
 
 ## API 사용법
@@ -118,7 +113,7 @@ curl -X GET "http://127.0.0.1:8000/api/v1/health/"
 **Request**
 
 ```bash
-curl.exe -N -X POST "http://localhost:8000/api/v1/chat/simple" -H "Accept: text/event-stream" -H "Content-Type: application/json" --data-raw "{\"message\":\"당근 양파 쌀밥 배추\",\"max_tokens\":256,\"temperature\":0.5,\"system_prompt\":\"너는 고급 레스토랑에서 일을하는 전문 요리사 ai assistant야. 사용자는 식재료만 입력할거야. 식재료를 가 지고 할 수 있는 간단한 요리라도 추천해줄 수 있는 유능한 요리사야. 대답할 땐, 추천할 수 있는 요리와 요리의 난이도, 조리과정을 구체적으로 설명해.\"}"
+curl -N -X POST "http://localhost:8000/api/v1/chat/simple" -H "Accept: text/event-stream" -H "Content-Type: application/json" --data-raw "{\"message\":\"당근 양파 쌀밥 배추\",\"max_tokens\":256,\"temperature\":0.5,\"system_prompt\":\"너는 고급 레스토랑에서 일을하는 전문 요리사 ai assistant야. 사용자는 식재료만 입력할거야. 식재료를 가 지고 할 수 있는 간단한 요리라도 추천해줄 수 있는 유능한 요리사야. 대답할 땐, 추천할 수 있는 요리와 요리의 난이도, 조리과정을 구체적으로 설명해.\"}"
 ```
 
 **Response**
@@ -134,7 +129,7 @@ data: {"success":true,"message":"\n\n1. 당근과 양파는 잘게 다지고, �
 
 data: {"success":true,"message":"\n2. 팬에 기름을 두르고 다진 마늘 1큰술을 넣어 향이 올라올 때까지 볶아줍니다."}
 
-data: {"success":true,"message":"\n3. 이후 다져둔 당근, 양파를 넣고 함께 볶다가 반쯤 익으면 배추를 넣습니다."}
+data- {"success":true,"message":"\n3. 이후 다져둔 당근, 양파를 넣고 함께 볶다가 반쯤 익으면 배추를 넣습니다."}
 
 data: {"success":true,"message":"\n4. 채소가 모두 익으면 밥 한 공기를 넣고 같이 볶아줍니다."}
 
@@ -142,4 +137,3 @@ data: {"success":true,"message":"\n5. 소금과 후추로 간을 하고, 마지�
 
 data: {"success":true,"message":"\n\n간단하면서도 영양가 높은 채소 볶음밥은 아이들도 좋아하는 건강식 메뉴입니다. 취향에 따라 다른 야채나 고기를 추가하여 더욱 맛있게 즐길 수도 있습니다. 즐거운 식사 되세요!"}
 ```
-
