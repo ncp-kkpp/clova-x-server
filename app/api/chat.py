@@ -10,7 +10,7 @@ router = APIRouter(prefix="/api/v1/chat", tags=["Chat"])
 def get_hyperclova_service():
     return HyperCLOVAService()
 
-@router.post("/simple")
+@router.post("/recipe-recommend")
 async def simple_chat(
     request: ChatRequest,
     service: HyperCLOVAService = Depends(get_hyperclova_service)
