@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends
 from fastapi.responses import StreamingResponse
 from fastapi.concurrency import iterate_in_threadpool
 import json
-from app.models import ChatRequest, ConversationRequest, ChatResponse, ErrorResponse
+from app.models import RecipeRecommendRequest, MealGenerateRequest, ConversationRequest, ChatResponse, ErrorResponse
 from app.services.hyperclova_service import HyperCLOVAService
 
 router = APIRouter(prefix="/api/v1/chat", tags=["Chat"])
@@ -12,7 +12,7 @@ def get_hyperclova_service():
 
 @router.post("/recipe-recommend")
 async def simple_chat(
-    request: ChatRequest,
+    request: RecipeRecommendRequest,
     service: HyperCLOVAService = Depends(get_hyperclova_service)
 ):
     """남은 식재료를 통한 요리 레시피 추천"""
@@ -47,7 +47,7 @@ async def simple_chat(
 
 @router.post("/meal-plan-create")
 async def simple_chat(
-    request: ChatRequest,
+    request: MealGenerateRequest,
     service: HyperCLOVAService = Depends(get_hyperclova_service)
 ):
     """주간/월간 식단 구성"""
