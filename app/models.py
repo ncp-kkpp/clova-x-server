@@ -12,10 +12,9 @@ class ChatMessage(BaseModel):
     content: str
 
 class ChatRequest(BaseModel):
-    message: str = Field(..., description="사용자 메시지")
+    message: str = Field(..., description="양파,당근,양배추,김치")
     max_tokens: int = Field(default=256, ge=1, le=4096, description="최대 토큰 수")
     temperature: float = Field(default=0.5, ge=0.0, le=1.0, description="창의성 조절")
-    system_prompt: Optional[str] = Field(default=None, description="시스템 프롬프트")
 
 class ConversationRequest(BaseModel):
     messages: List[ChatMessage] = Field(..., description="대화 히스토리")
